@@ -20,6 +20,15 @@ const panelDefaults = {
     y_legend: null
   },
 
+  chart: {
+    type: 'bubble', //bubble, line
+    animation_duration: 0,
+  },
+
+  postprocess: {
+    accumulate: false,
+  },
+
   fields: {
     x_label: null,
     y_label: null,
@@ -30,9 +39,54 @@ const panelDefaults = {
 
 export class UdsHighChartsCtrl extends MetricsPanelCtrl {
 
+
   constructor($scope, $injector, $rootScope) {
     super($scope, $injector);
     _.defaultsDeep(this.panel, panelDefaults);
+
+    this.graphTypes = [
+        { text: 'Area', value: 'area' },
+        { text: 'Area Range', value: 'arearange' },
+        { text: 'Area Spline', value: 'areaspline' },
+        { text: 'Bar', value: 'bar' },
+        { text: 'Bellcurve', value: 'bellcurve' },
+        { text: 'Boxplot', value: 'boxplot' },
+        { text: 'Bubble', value: 'bubble' },
+        { text: 'Bullet', value: 'bullet' },
+        { text: 'Column', value: 'column' },
+        { text: 'Column Pyramid', value: 'columnpyramid' },
+        { text: 'Column Range', value: 'columrange' },
+        { text: 'Cylinder', value: 'cylinder' },
+        { text: 'Errorbar', value: 'errorbar' },
+        { text: 'Funnel', value: 'funnel' },
+        { text: 'Gauge', value: 'gauge' },
+        { text: 'Heatmap', value: 'heatmap' },
+        { text: 'Histogram', value: 'histogram' },
+        { text: 'Line Chart', value: 'line' },
+        { text: 'Networkgraph', value: 'networkgraph' },
+        { text: 'Packed Bubble', value: 'packedbubble' },
+        { text: 'Pareto', value: 'pareto' },
+        { text: 'Pie', value: 'pie' },
+        { text: 'Polygon', value: 'polygon' },
+        { text: 'Pyramid', value: 'pyramid' },
+        { text: 'Sankey', value: 'sankey' },
+        { text: 'Scatter Plot', value: 'scatter' },
+        { text: 'Scatter Plot 3D', value: 'scatter3d' },
+        { text: 'Solid Gauge', value: 'solidgauge' },
+        { text: 'Spline', value: 'spline' },
+        { text: 'Streamgraph', value: 'streamgraph' },
+        { text: 'Cunburst', value: 'sunburst' },
+        { text: 'Tilemap', value: 'tilemap' },
+        { text: 'Treemap', value: 'treemap' },
+        { text: 'Variable Pie', value: 'variablepie' },
+        { text: 'Variwide', value: 'variwide' },
+        { text: 'Vector', value: 'vector' },
+        { text: 'Venn Diagram', value: 'venn' },
+        { text: 'Waterfall', value: 'waterfall' },
+        { text: 'Windbarb', value: 'windbarb' },
+        { text: 'Wordcloud', value: 'wordcloud' },
+        { text: 'XRange', value: 'xrange' }
+    ];
 
     this.$rootScope = $rootScope;
 
@@ -64,7 +118,6 @@ export class UdsHighChartsCtrl extends MetricsPanelCtrl {
   }
 
   onRender() {
-    console.log('render!');
     if (this.ctx == null) {
       if (document.getElementById(this.canvasid) != null) {
         this.ctx = document.getElementById(this.canvasid).getContext('2d');
@@ -72,10 +125,13 @@ export class UdsHighChartsCtrl extends MetricsPanelCtrl {
     }
     if (!this.chart) {
         this.chart = Highcharts.chart(this.divid, {
-            chart: {type: 'bubble',plotBorderWidth: 0,zoomType: 'xy'},
+            chart: {type: this.panel.chart.type, plotBorderWidth: 1,zoomType: 'xy'},
             legend: { enabled: false },
-            title: null,    //{ show: false, text: 'Sugar and fat intake per country'},
-            subtitle: null, //{text: 'Source: <a href="http://www.euromonitor.com/">Euromonitor</a> and <a href="https://data.oecd.org/">OECD</a>'},
+            title: (this.panel.labels.title) ? { show: true, text: this.panel.labels.title} : null,
+            subtitle: (this.panel.labels.subtitle) ? { show: true, text: this.panel.labels.subtitle} : null,
+            /*
+            tooltip: {backgroundColor: '#FCFFC5', borderColor: 'black',borderRadius: 10,borderWidth: 3},
+            */
             tooltip: {
                 useHTML: true,
                 headerFormat: '<table>',
@@ -88,15 +144,35 @@ export class UdsHighChartsCtrl extends MetricsPanelCtrl {
             },
             yAxis: {title: {text: null}, min:0},
             xAxis: {title: {text: null}, min:0},
-            plotOptions: {series: {dataLabels: {enabled: true, format: '{point.name}'}}},
-            series: [{data: [{ x: 0, y: 0, z: 0, name: '', country: '' }]}]
+            //xAxis: (this.panel.x_axis.categories) ? {categories: this.panel.x_axis.categories.split(',')} : {title: {text: null}, min:0},
+            plotOptions: {
+                series: {dataLabels: {enabled: true, format: '{point.name}', animation: {duration: this.panel.chart.animation_duration}}},
+                line: {dataLabels: {enabled: true},enableMouseTracking: false, animation: {duration: this.panel.chart.animation_duration}}
+            },
+            series: (this.panel.chart.type.replace('string:','').trim() === 'bubble') ? [{data: [{ x: 0, y: 0, z: 0, name: '', country: '' }]}] : []
         });
     }
-    if (this.data) this.chart.series[0].setData(this.data);
-    this.chart.render();
-    //console.log("chart: ", this.chart);
-    //this.updateChart();
 
+    if (this.data) {
+        //Todo - determine setters based on data properties
+        if (this.panel.chart.type.replace('string:','').trim() === 'bubble') {
+            this.chart.series[0].setData(this.data);
+            this.chart.render();
+        } else {
+            while (this.chart.series.length > 0) { this.chart.series[0].remove(false);}
+            for (let i = 0; i < this.data.length; i++) {
+                this.chart.addSeries(this.data[i], false);
+            }
+        }
+    }
+
+    /* If type changed
+    let type = this.panel.chart.type.replace('string:','').trim();
+    this.chart.series.forEach(function(series) {series.update({type: type},false)});
+    */
+
+    this.chart.redraw();
+    //this.updateChart();
   }
 
   decodeNonHistoricalData(fulldata) {
@@ -107,29 +183,78 @@ export class UdsHighChartsCtrl extends MetricsPanelCtrl {
   // Data received
   //***************************************************
   onDataReceived(dataList) {
-    let new_data = [];
-    if (dataList && dataList[0] && dataList[0].rows) {
-        dataList[0].rows.forEach(function(row) {
-            let entry = {};
-            for (let i = 0; i < dataList[0].columns.length; i++) {
-                entry[dataList[0].columns[i].text] = row[i] || (dataList[0].columns[i].text === 'name' || dataList[0].columns[i].text === 'details' ? '' : 0);
-            }
-            new_data.push(entry);
-        });
-    }
-    this.data = new_data;
-    try {
-      if (this.chart != null) this.chart.series[0].setData(this.data);
-    } catch (e) {
-      console.log('Error:', e);
+      switch(this.panel.chart.type.replace('string:','').trim()) {
+      case 'bubble': {
+          this.bubbleData(dataList);
+          break;
+      }
+      case 'line': {
+          this.chartData(dataList);
+          break;
+      }
     }
     this.updateChart();
     this.render();
   }
 
+  chartData(dataList) {
+      let new_data = [];
+
+      let series = null;
+      let values = null;
+
+      if (dataList && dataList[0] && dataList[0].columns) {
+          for (let i = 0; i < dataList[0].columns.length; i++) {
+              if (dataList[0].columns[i].text === 'series') series = i;
+
+              if (dataList[0].columns[i].text === 'values') values = i;
+          }
+      }
+
+      if (series != null && values != null) {
+          if (dataList && dataList[0] && dataList[0].rows) {
+              dataList[0].rows.forEach(function(row) {
+                  new_data.push({name: row[series], data: JSON.parse(row[values].replace('(','[').replace(')',']'))});
+              });
+          }
+      }
+
+      if (this.panel.postprocess.accumulate) {
+          for (let i = 0; i < new_data.length; i++) {
+              let newValues = [];
+              let sum = 0;
+              for (let r = 0; r < new_data[i].data.length; r++) {
+                  sum += new_data[i].data[r];
+                  newValues.push(sum);
+              }
+              new_data[i].data = newValues;
+          }
+      }
+      this.data = new_data;
+  }
+
+  bubbleData(dataList) {
+      let new_data = [];
+      if (dataList && dataList[0] && dataList[0].rows) {
+          dataList[0].rows.forEach(function(row) {
+              let entry = {};
+              for (let i = 0; i < dataList[0].columns.length; i++) {
+                  entry[dataList[0].columns[i].text] = row[i] || (dataList[0].columns[i].text === 'name' || dataList[0].columns[i].text === 'details' ? '' : 0);
+              }
+              new_data.push(entry);
+          });
+      }
+      this.data = new_data;
+      try {
+          if (this.chart != null) this.chart.series[0].setData(this.data);
+      } catch (e) {
+          console.log('Error:', e);
+      }
+  }
+
   onInitEditMode() {
     //console.log('onInitEditMode');
-    this.addEditorTab('Options', 'public/plugins/uds-highcharts-panel/editor.html', 2);
+    this.addEditorTab('Options', 'public/plugins/sp-highcharts/editor.html', 2);
   }
 
   onPanelTeardown() {
