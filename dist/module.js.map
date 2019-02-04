@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/module.js"],"names":["UdsHighChartsCtrl"],"mappings":";;;;;;;;AAAQA,6B,uBAAAA,iB;;;iCAGJA,iB","file":"module.js","sourcesContent":["import {UdsHighChartsCtrl} from './udshighcharts_ctrl';\n\nexport {\n    UdsHighChartsCtrl as PanelCtrl\n};\n"]}
