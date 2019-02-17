@@ -1,7 +1,7 @@
 {
-  "name": "sp-highcharts",
+  "name": "sal-highcharts",
   "version": "1.4.1",
-  "description": "Segmentproxy Highcharts Plugin for Grafana",
+  "description": "Smartlytics Highcharts Plugin for Grafana",
   "main": "src/module.js",
   "scripts": {
     "lint": "eslint --color .",

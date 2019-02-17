@@ -1,13 +1,13 @@
 {
   "type": "panel",
-  "name": "SP Highcharts",
-  "id": "sp-highcharts",
+  "name": "SAL Highcharts",
+  "id": "sal-highcharts",
 
   "info": {
-    "description": "Segmentproxy Highcharts Panel for grafana",
+    "description": "Smartlytics Highcharts Panel for grafana",
     "author": {
-      "name": "Segmentproxy",
-      "url": "https://github.com/segmentproxy"
+      "name": "Smartlytics",
+      "url": "https://github.com/smartlytics-com"
     },
     "keywords": ["highcharts", "panel"],
     "logos": {
@@ -15,8 +15,8 @@
       "large": "src/img/logo.svg"
     },
     "links": [
-      {"name": "Project site", "url": "https://github.com/segmentproxy/sp-hughcharts"},
-      {"name": "MIT License", "url": "https://github.com/segmentproxy/sp-hughcharts"}
+      {"name": "Project site", "url": "https://github.com/smartlytics-com/sal-hughcharts"},
+      {"name": "MIT License", "url": "https://github.com/smartlytics-com/sal-hughcharts"}
     ],
     "screenshots": [
       {"name": "Showcase", "path": "src/img/highcharts-showcase.jpg"}
