@@ -15,8 +15,8 @@
       "large": "src/img/logo.svg"
     },
     "links": [
-      {"name": "Project site", "url": "https://github.com/smartlytics-com/sal-hughcharts"},
-      {"name": "MIT License", "url": "https://github.com/smartlytics-com/sal-hughcharts"}
+      {"name": "Project site", "url": "https://github.com/smartlytics-com/sal-highcharts"},
+      {"name": "MIT License", "url": "https://github.com/smartlytics-com/sal-highcharts"}
     ],
     "screenshots": [
       {"name": "Showcase", "path": "src/img/highcharts-showcase.jpg"}
